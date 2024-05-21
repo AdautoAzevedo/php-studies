@@ -15,13 +15,16 @@
             $name = $_POST['name'];
             $email = $_POST['email'];
 
-            $sql = "INSERT INTO users (name, email) VALUES ('$name', '$email')";
+            //Prepared statement to prevent SQL injection
+            $stmt = $conn->prepare("INSERT INTO users (name, email) VALUES (?, ?)");
+            $stmt->bind_param("ss", $name, $email);
 
-            if ($conn->query($sql === TRUE)) {
+            if ($stmt->execute())) {
                 echo "New record created successfully";
             } else {
-                echo "Error: " . $sql . "<br>" . $conn->error;
+                echo "Error: " . $stmt->error;
             }
+            $stmt->close();
         }
 
         //Update
@@ -30,13 +33,15 @@
             $name = $_POST['name'];
             $email = $_POST['email'];
 
-            $sql = "UPDATE users SET name = '$name', email = '$email' WHERE id=$id";
+            $stmt = $conn->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
+            $stmt->bind_param("ssi", $name, $email, $id);
 
-            if ($conn->query($sql === TRUE)) {
+            if ($stmt->execute()) {
                 echo "Record updated successfully";
             } else {
-                "Error updating record: " . $conn->error;
+                "Error updating record: " . $stmt->error;
             }
+            $stmt->close();
         }
 
         //Read
